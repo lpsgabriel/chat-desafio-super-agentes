@@ -39,7 +39,14 @@ jobs:
         id: register_task_definition
         run: |
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition desafio-super-agentes)
-          NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION" | jq --arg IMAGE "lpsgabriel/desafio-super-agentes:${{ env.COMMIT_HASH }}" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          TASK_DEFINITION_CLEAN=$(echo "$TASK_DEFINITION" | jq 'del(.taskDefinition.containerDefinitions[0].environment)')
+          echo "Filtered Task Definition: $TASK_DEFINITION_CLEAN"
+
+          NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION" | jq --arg IMAGE "lpsgabriel/desafio-super-agentes:${{ env.COMMIT_HASH }}" '
+            .taskDefinition 
+            | .containerDefinitions[0].image = $IMAGE
+            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)
+          ')
           echo "$NEW_TASK_DEFINITION" > new-task-definition.json
           aws ecs register-task-definition --cli-input-json file://new-task-definition.json
 
