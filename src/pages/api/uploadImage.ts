@@ -2,6 +2,10 @@ import { IncomingForm, Files, Fields } from "formidable";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { OpenAI } from "openai";
 import vision from "@google-cloud/vision";
+import { PrismaClient } from "@prisma/client";
+import { createNewConversation } from "@/utils";
+
+const prisma = new PrismaClient();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -31,11 +35,29 @@ export default async function handler(
     };
 
     try {
-      const { files } = await parseForm();
+      const { fields, files } = await parseForm();
+      const { conversationId } = fields;
+      let conversation = conversationId
+        ? await prisma.conversation.findUnique({
+            where: {
+              id: conversationId[0],
+            },
+            include: {
+              messages: {
+                orderBy: {
+                  createdAt: "asc",
+                },
+              },
+            },
+          })
+        : null;
+      if (!conversation) {
+        conversation = await createNewConversation("Análise de imagem");
+      }
       const imageFile = Array.isArray(files.image)
         ? files.image[0]
         : files.image;
-      if (!imageFile || !imageFile) {
+      if (!imageFile) {
         throw new Error("Nenhuma imagem válida foi enviada.");
       }
       const imagePath = imageFile.filepath;
@@ -45,6 +67,13 @@ export default async function handler(
         throw new Error("Nenhum objeto ou rótulo foi detectado na imagem.");
       }
       const descriptions = labels.map((label) => label.description).join(", ");
+      const newUserMessage = await prisma.message.create({
+        data: {
+          conversationId: conversation.id,
+          origin: "user",
+          content: `Imagem enviada para análise`,
+        },
+      });
       const gptResponse = await openai.chat.completions.create({
         model: "gpt-4",
         messages: [
@@ -59,9 +88,19 @@ export default async function handler(
           },
         ],
       });
+      const aiMessage = await prisma.message.create({
+        data: {
+          conversationId: conversation.id,
+          content:
+            gptResponse.choices[0].message.content ??
+            "Não foi possível analisar a imagem.",
+          origin: "assistant",
+        },
+      });
       res.status(200).json({
-        origin: "ai",
-        content: gptResponse.choices[0].message.content,
+        conversationId: conversation.id,
+        userMessage: newUserMessage,
+        aiMessage: aiMessage,
       });
     } catch (error) {
       console.error(error);
