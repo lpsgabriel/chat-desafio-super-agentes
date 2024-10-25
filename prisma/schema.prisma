@@ -25,7 +25,8 @@ model Conversation {
 
 enum MessageOrigin {
   user
-  ai
+  assistant
+  system
 }
 
 model Message {
@@ -34,6 +35,7 @@ model Message {
   origin         MessageOrigin
   conversation   Conversation  @relation(fields: [conversationId], references: [id])
   content        String
+  createdAt      DateTime      @default(now())
 
   @@map("messages")
 }
