@@ -1,40 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Desafio Chat Super Agentes
 
-## Getting Started
+Como pedido pelos requisitos do desafio, a presenta aplicação foi feita utilizando Next.js para frontend e backend, utilizando-se também a biblioteca de componentes ChakraUI, e o ORM Prisma, afim de cooperar no desenvolvimento do código e entrega do projeto.
 
-First, run the development server:
+O chat desenvolvido se comunica com o modelo de linguagem da OpenAI, além de utilizar Google Vision para a interpretação de imagens enviadas pelo usuário.
 
+Todas as conversas e mensagens são armazenadas em um banco de dados PostgreSQL, afim de prover um histórico das conversas para dar profundidade às interações do usuário.
+
+Além disso, para o processamento de arquivos, implementou-se uma fila de processamento para arquivos .TXT utilizando-se o BullMQ, no qual armazena a interpretação do conteúdo de cada arquivo anexado para incluir no contexto da presente conversa.
+
+A aplicação está hospedada na AWS, utilizando-se juntamente o GitHub Actions para entrega contínua da última versão estável do código implementado. O link da aplicação foi passado para o avaliador responsável.
+
+## Como Iniciar o Projeto Localmente
+1. Certifique-se que o Docker esteja instalado e em execução;
+2. No diretório raiz do projeto, execute o seguinte comando:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker-compose up
 ```
+3. A aplicação estará disponível em [http://localhost:3000](http://localhost:3000)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configurações Necessárias
+Para executar a aplicação localmente é necessário configurar algumas variáveis de ambientes:
+- DATABASE_URL
+- GOOGLE_VISION_CREDENTIALS
+- OPENAI_API_KEY
+- REDIS_HOST
+- REDIS_PORT
+- REDIS_USERNAME
+- REDIS_PASSWORD
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
