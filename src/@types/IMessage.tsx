@@ -1,5 +1,11 @@
-export type IMessage = {
+export type IMessageDb = {
+  id: string;
   conversationId: string;
-  origin: "user" | "ai";
+  origin: "user" | "assistant";
+  content: string;
+};
+
+export type IMessageGpt = {
+  role: "user" | "system" | "assistant";
   content: string;
 };
