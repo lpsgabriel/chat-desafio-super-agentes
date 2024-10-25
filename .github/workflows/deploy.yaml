@@ -19,10 +19,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract short commit SHA
-        id: vars
-        run: echo "COMMIT_HASH=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_ENV
-
       - name: Build and push Docker image
         run: |
           docker build -t lpsgabriel/desafio-super-agentes:latest .
