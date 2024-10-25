@@ -33,7 +33,6 @@ export default async function handler(
         });
       });
     };
-
     try {
       const { fields, files } = await parseForm();
       const { conversationId } = fields;
@@ -70,6 +69,7 @@ export default async function handler(
       const newUserMessage = await prisma.message.create({
         data: {
           conversationId: conversation.id,
+          type: "image",
           origin: "user",
           content: `Imagem enviada para análise`,
         },
@@ -91,6 +91,7 @@ export default async function handler(
       const aiMessage = await prisma.message.create({
         data: {
           conversationId: conversation.id,
+          type: "image",
           content:
             gptResponse.choices[0].message.content ??
             "Não foi possível analisar a imagem.",

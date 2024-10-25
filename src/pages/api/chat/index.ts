@@ -36,6 +36,7 @@ export default async function handler(
       const newUserMessage = await prisma.message.create({
         data: {
           conversationId: conversation.id,
+          type: "text",
           origin: "user",
           content: message,
         },
@@ -65,6 +66,7 @@ export default async function handler(
       const aiMessage = await prisma.message.create({
         data: {
           conversationId: conversation.id,
+          type: "text",
           content: aiResponse ?? "Desculpe, não entendi o que você disse.",
           origin: "assistant",
         },

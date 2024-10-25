@@ -13,9 +13,11 @@ import {
   Input,
   Text,
   useDisclosure,
+  IconButton,
 } from "@chakra-ui/react";
 import { IoMdSend } from "react-icons/io";
 import { CgAttachment } from "react-icons/cg";
+import { FaRegImage } from "react-icons/fa6";
 
 interface ChatInputProps {
   sendMessage: (message: string) => void;
@@ -29,11 +31,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleTextFileUpload,
 }) => {
   const [textInput, setTextInput] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const popoverDisclosure = useDisclosure();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageFileClick = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleTextFileClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleSendMessage = () => {
     if (textInput.trim()) {
@@ -43,6 +52,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const clearInput = () => {
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -50,16 +62,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setSelectedImage(e.target.files[0]);
       handleImageUpload(e.target.files[0]);
+      popoverDisclosure.onClose();
       clearInput();
     }
   };
 
   const handleTextFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setSelectedFile(e.target.files[0]);
       handleTextFileUpload(e.target.files[0]);
+      popoverDisclosure.onClose();
+      clearInput();
     }
   };
 
@@ -86,45 +99,46 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent color={"white"} bg={"#2a2a2a"} borderColor={"#2a2a2a"}>
-          <PopoverHeader pt={4} fontWeight="bold" border="0">
-            Enviar Anexo
-          </PopoverHeader>
           <PopoverArrow bg={"#2a2a2a"} />
           <PopoverCloseButton zIndex={2} onClick={popoverDisclosure.onClose} />
           <PopoverBody>
             <Flex>
-              <Flex flexDirection={"column"}>
-                <Text>Imagem</Text>
+              <Flex flexDirection={"column"} p={"1rem"} alignItems={"center"}>
                 <Input
-                  ref={fileInputRef}
+                  ref={imageInputRef}
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
+                  display={"none"}
                 />
                 <Button
-                  isDisabled={!selectedImage}
-                  onClick={() => {
-                    handleImageUpload(selectedImage!);
-                    popoverDisclosure.onClose();
-                    setSelectedImage(null);
+                  w={"100%"}
+                  onClick={handleImageFileClick}
+                  bg={"#2a2a2a"}
+                  border={"1px solid #DD6b20"}
+                  py={"1.75rem"}
+                  _active={{
+                    bg: "#1a1a1a",
+                    "& > svg": { color: "orange.800" },
+                  }}
+                  _hover={{
+                    bg: "#1a1a1a",
+                    "& > svg": { color: "orange.600" },
                   }}
                 >
-                  Enviar
+                  <Icon boxSize={"2rem"} as={FaRegImage} color={"#DD6b20"} />
                 </Button>
+                <Text mt={"0.25rem"}>Imagem</Text>
               </Flex>
               <Flex flexDirection={"column"}>
                 <Text>Arquivo .txt</Text>
                 <Input
+                  ref={fileInputRef}
                   type="file"
                   accept=".txt"
                   onChange={handleTextFileChange}
+                  display={"none"}
                 />
-                <Button
-                  onClick={() => handleTextFileUpload(selectedFile!)}
-                  isDisabled={!selectedFile}
-                >
-                  Enviar
-                </Button>
               </Flex>
             </Flex>
           </PopoverBody>

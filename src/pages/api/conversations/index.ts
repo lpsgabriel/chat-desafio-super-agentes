@@ -10,6 +10,9 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const conversations = await prisma.conversation.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
         include: {
           messages: {
             orderBy: {

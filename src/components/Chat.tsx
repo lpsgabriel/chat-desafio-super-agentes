@@ -56,6 +56,9 @@ const Chat: React.FC<ChatProps> = ({
 
   const handleTextFileUpload = async (file: File) => {
     const formData = new FormData();
+    if (conversationId) {
+      formData.append("conversationId", conversationId);
+    }
     formData.append("file", file);
     const response = await axios.post("/api/uploadTextFile", formData);
     setMessages([

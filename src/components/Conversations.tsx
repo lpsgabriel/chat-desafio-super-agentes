@@ -19,8 +19,6 @@ const Conversations: React.FC<ConversationsProps> = ({
 }) => {
   const [conversationList, setConversationList] = useState<IConversation[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   useEffect(() => {
     setConversationList(conversations);
@@ -50,24 +48,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     loadConversations();
   }, [loadConversations]);
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-  const handleScroll = () => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      const isAtBottom =
-        container.scrollHeight - container.scrollTop === container.clientHeight;
-      setIsUserScrolling(!isAtBottom);
-    }
-  };
-  useEffect(() => {
-    if (!isUserScrolling) {
-      scrollToBottom();
-    }
-  }, [conversationList, isUserScrolling]);
   return (
     <Flex
       flexDirection={"column"}
@@ -87,14 +67,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       >
         Nova Conversa
       </Button>
-      <Flex
-        flexDirection={"column"}
-        p={4}
-        w={"300px"}
-        overflow={"auto"}
-        onScroll={handleScroll}
-        ref={scrollContainerRef}
-      >
+      <Flex flexDirection={"column"} p={4} w={"300px"} overflow={"auto"}>
         {conversationList?.map((conversation: IConversation) => (
           <Flex
             key={conversation.id}

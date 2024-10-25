@@ -8,7 +8,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { id } = req.query;
-
   if (req.method === "GET") {
     try {
       const conversation = await prisma.conversation.findUnique({
@@ -23,7 +22,6 @@ export default async function handler(
           },
         },
       });
-
       if (!conversation) {
         return res.status(404).json({ error: "Conversa não encontrada" });
       }

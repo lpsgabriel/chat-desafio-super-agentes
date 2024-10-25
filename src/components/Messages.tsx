@@ -25,20 +25,26 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
       h={"100%"}
       p={4}
     >
-      {messages.map((msg) => (
-        <Box
-          key={msg.id}
-          my={1}
-          p={2}
-          bg={msg?.origin === "user" ? "#2a2a2a" : "transparent"}
-          ml={msg?.origin === "user" ? "6rem" : 0}
-          borderRadius="3xl"
-        >
-          <Flex p={2}>
-            <Text>{msg?.content}</Text>
-          </Flex>
-        </Box>
-      ))}
+      {messages.length > 0 ? (
+        messages
+          .filter((msg) => msg.type !== "file")
+          .map((msg) => (
+            <Box
+              key={msg?.id}
+              my={1}
+              p={2}
+              bg={msg?.origin === "user" ? "#2a2a2a" : "transparent"}
+              ml={msg?.origin === "user" ? "6rem" : 0}
+              borderRadius="3xl"
+            >
+              <Flex p={2}>
+                <Text>{msg?.content}</Text>
+              </Flex>
+            </Box>
+          ))
+      ) : (
+        <Box>Olá! Como posso ajudar?</Box>
+      )}
       <div ref={messagesEndRef} />
     </Flex>
   );
