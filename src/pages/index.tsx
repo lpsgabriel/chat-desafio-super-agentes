@@ -68,6 +68,7 @@ export default function Home() {
           conversationId={selectedConversationId}
           initialMessages={messages}
           chatMutate={loadConversations}
+          setConversation={setSelectedConversationId}
         />
       </Flex>
     </Flex>

@@ -18,11 +18,16 @@ export async function processTextFile(
         {
           role: "system",
           content:
-            "Processando conteúdo do arquivo .txt para enriquecer o contexto da conversa.",
+            "Você é um assistente que processa textos extraídos de um arquivo afim de enriquecer o contexto de uma conversa.",
         },
-        { role: "user", content: text },
+        {
+          role: "user",
+          content: `Aqui está o conteúdo do arquivo: ${text} processe-o, interprete-o afim de enriquecer as próximas respostas e contextos passados na conversa.`,
+        },
       ],
     });
+
+    const now = new Date();
 
     await prisma.$transaction([
       prisma.message.create({
@@ -31,6 +36,7 @@ export async function processTextFile(
           type: "text",
           origin: "user",
           content: "Arquivo enviado para contexto!",
+          createdAt: new Date(now.getTime()),
         },
       }),
       prisma.message.create({
@@ -41,6 +47,7 @@ export async function processTextFile(
           content:
             gptResponse.choices[0].message.content ??
             "Erro no processamento do arquivo.",
+          createdAt: new Date(now.getTime() + 10),
         },
       }),
       prisma.message.create({
@@ -48,9 +55,8 @@ export async function processTextFile(
           conversationId,
           type: "text",
           origin: "assistant",
-          content: gptResponse.choices[0].message.content
-            ? "Arquivo processado com sucesso!"
-            : "Erro no processamento do arquivo.",
+          content: "Arquivo anexado ao contexto da conversa!",
+          createdAt: new Date(now.getTime() + 20),
         },
       }),
     ]);

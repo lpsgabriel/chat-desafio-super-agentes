@@ -9,15 +9,19 @@ interface ChatProps {
   conversationId: string | null;
   initialMessages: IMessageDb[];
   chatMutate: () => void;
+  setConversation: (conversationId: string) => void;
 }
 
 const Chat: React.FC<ChatProps> = ({
   conversationId,
   initialMessages,
   chatMutate,
+  setConversation,
 }) => {
-  const [messages, setMessages] = useState<IMessageDb[]>(initialMessages);
-
+  const [messages, setMessages] =
+    useState<Partial<IMessageDb>[]>(initialMessages);
+  const [newMessageIsLoading, setNewMessageIsLoading] =
+    useState<boolean>(false);
   useEffect(() => {
     setMessages(initialMessages);
   }, [initialMessages]);
@@ -29,10 +33,17 @@ const Chat: React.FC<ChatProps> = ({
   }, [messages, chatMutate]);
 
   const sendMessage = async (message: string) => {
+    setNewMessageIsLoading(true);
+    setMessages([
+      ...messages,
+      { origin: "user", content: message, type: "text" },
+    ]);
     const response = await axios.post("/api/chat", {
       message,
       conversationId,
     });
+    setNewMessageIsLoading(false);
+    setConversation(response.data.conversationId);
     setMessages([
       ...messages,
       response.data.userMessage,
@@ -41,12 +52,19 @@ const Chat: React.FC<ChatProps> = ({
   };
 
   const handleImageUpload = async (file: File) => {
+    setNewMessageIsLoading(true);
+    setMessages([
+      ...messages,
+      { origin: "user", content: "Imagem enviada para análise", type: "text" },
+    ]);
     const formData = new FormData();
     formData.append("image", file);
     if (conversationId) {
       formData.append("conversationId", conversationId);
     }
     const response = await axios.post("/api/uploadImage", formData);
+    setNewMessageIsLoading(false);
+    setConversation(response.data.conversationId);
     setMessages([
       ...messages,
       response.data.userMessage,
@@ -54,17 +72,46 @@ const Chat: React.FC<ChatProps> = ({
     ]);
   };
 
-  const handleTextFileUpload = async (file: File) => {
+  const handleTextFileUpload = async (files: FileList) => {
     const formData = new FormData();
+    const filesLength = files.length;
+    setMessages([
+      ...messages,
+      {
+        origin: "user",
+        content: `${
+          filesLength > 1 ? "Arquivos enviados" : "Arquivo enviado"
+        } para contexto!`,
+        type: "text",
+      },
+    ]);
+    setNewMessageIsLoading(true);
     if (conversationId) {
       formData.append("conversationId", conversationId);
     }
-    formData.append("file", file);
+    for (const file of files) {
+      formData.append("file", file);
+    }
     const response = await axios.post("/api/uploadTextFile", formData);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setNewMessageIsLoading(false);
+    setConversation(response.data.conversationId);
     setMessages([
       ...messages,
-      response.data.userMessage,
-      response.data.aiMessage,
+      {
+        origin: "user",
+        content: `${
+          filesLength > 1 ? "Arquivos enviados" : "Arquivo enviado"
+        } para contexto!`,
+        type: "text",
+      },
+      {
+        origin: "assistant",
+        content: `${
+          filesLength > 1 ? "Arquivos anexados" : "Arquivo anexado"
+        } ao contexto da conversa!`,
+        type: "text",
+      },
     ]);
   };
 
@@ -77,7 +124,7 @@ const Chat: React.FC<ChatProps> = ({
       flexDirection={"column"}
       py={8}
     >
-      <Messages messages={messages} />
+      <Messages messages={messages} newMessageIsLoading={newMessageIsLoading} />
       <ChatInput
         sendMessage={sendMessage}
         handleImageUpload={handleImageUpload}

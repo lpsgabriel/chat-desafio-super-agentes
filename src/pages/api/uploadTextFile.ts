@@ -36,16 +36,15 @@ export default async function handler(
       if (!conversation) {
         conversation = await createNewConversation("Análise de arquivo txt");
       }
-      const file = Array.isArray(files.file) ? files.file[0] : files.file;
-
-      if (!file?.filepath) {
-        return res.status(400).json({ error: "Arquivo inválido." });
+      const fileArray = Array.isArray(files.file) ? files.file : [files.file];
+      for (const file of fileArray) {
+        if (file?.filepath) {
+          await fileQueue.add("process-text-file", {
+            filePath: file.filepath,
+            conversationId: conversation.id,
+          });
+        }
       }
-      await fileQueue.add("process-text-file", {
-        filePath: file.filepath,
-        conversationId: conversation.id,
-      });
-
       res
         .status(200)
         .json({ conversationId: conversation.id ?? conversationId });

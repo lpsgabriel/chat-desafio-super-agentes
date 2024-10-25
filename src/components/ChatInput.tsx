@@ -9,20 +9,20 @@ import {
   PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
-  PopoverHeader,
   Input,
   Text,
   useDisclosure,
-  IconButton,
+  useOutsideClick,
 } from "@chakra-ui/react";
 import { IoMdSend } from "react-icons/io";
 import { CgAttachment } from "react-icons/cg";
 import { FaRegImage } from "react-icons/fa6";
+import { TbFileTypeTxt } from "react-icons/tb";
 
 interface ChatInputProps {
   sendMessage: (message: string) => void;
   handleImageUpload: (file: File) => void;
-  handleTextFileUpload: (file: File) => void;
+  handleTextFileUpload: (files: FileList) => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -33,6 +33,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [textInput, setTextInput] = useState("");
 
   const popoverDisclosure = useDisclosure();
+  const popoverRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,11 +71,16 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleTextFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      handleTextFileUpload(e.target.files[0]);
+      handleTextFileUpload(e.target.files);
       popoverDisclosure.onClose();
       clearInput();
     }
   };
+
+  useOutsideClick({
+    ref: popoverRef,
+    handler: () => popoverDisclosure.onClose(),
+  });
 
   return (
     <Flex borderRadius="md" bg={"#2a2a2a"} alignItems={"center"}>
@@ -83,7 +89,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <Button
             bg={"#2a2a2a"}
             borderLeftRadius={0}
-            onClick={popoverDisclosure.onOpen}
+            onClick={popoverDisclosure.onToggle}
             minW="auto"
             _active={{
               bg: "transparent",
@@ -98,11 +104,20 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <Icon as={CgAttachment} color={"#DD6b20"} />
           </Button>
         </PopoverTrigger>
-        <PopoverContent color={"white"} bg={"#2a2a2a"} borderColor={"#2a2a2a"}>
+        <PopoverContent
+          ref={popoverRef}
+          color={"white"}
+          bg={"#2a2a2a"}
+          borderColor={"#2a2a2a"}
+        >
           <PopoverArrow bg={"#2a2a2a"} />
-          <PopoverCloseButton zIndex={2} onClick={popoverDisclosure.onClose} />
+          <PopoverCloseButton
+            zIndex={2}
+            onClick={popoverDisclosure.onClose}
+            color={"#DD6b20"}
+          />
           <PopoverBody>
-            <Flex>
+            <Flex alignItems={"center"} justifyContent={"space-around"}>
               <Flex flexDirection={"column"} p={"1rem"} alignItems={"center"}>
                 <Input
                   ref={imageInputRef}
@@ -130,15 +145,33 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 </Button>
                 <Text mt={"0.25rem"}>Imagem</Text>
               </Flex>
-              <Flex flexDirection={"column"}>
-                <Text>Arquivo .txt</Text>
+              <Flex flexDirection={"column"} p={"1rem"} alignItems={"center"}>
                 <Input
                   ref={fileInputRef}
                   type="file"
                   accept=".txt"
                   onChange={handleTextFileChange}
                   display={"none"}
+                  multiple
                 />
+                <Button
+                  w={"100%"}
+                  onClick={handleTextFileClick}
+                  bg={"#2a2a2a"}
+                  border={"1px solid #DD6b20"}
+                  py={"1.75rem"}
+                  _active={{
+                    bg: "#1a1a1a",
+                    "& > svg": { color: "orange.800" },
+                  }}
+                  _hover={{
+                    bg: "#1a1a1a",
+                    "& > svg": { color: "orange.600" },
+                  }}
+                >
+                  <Icon boxSize={"2rem"} as={TbFileTypeTxt} color={"#DD6b20"} />
+                </Button>
+                <Text mt={"0.25rem"}>Arquivo</Text>
               </Flex>
             </Flex>
           </PopoverBody>

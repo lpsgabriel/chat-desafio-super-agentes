@@ -1,12 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { IMessageDb } from "@/@types/IMessage";
 
 interface MessageListProps {
-  messages: IMessageDb[];
+  messages: Partial<IMessageDb>[];
+  newMessageIsLoading: boolean;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages }) => {
+const MessageList: React.FC<MessageListProps> = ({
+  messages,
+  newMessageIsLoading,
+}) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -27,7 +31,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
     >
       {messages.length > 0 ? (
         messages
-          .filter((msg) => msg.type !== "file")
+          .filter((msg) => msg?.type !== "file")
           .map((msg) => (
             <Box
               key={msg?.id}
@@ -43,8 +47,21 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
             </Box>
           ))
       ) : (
-        <Box>Olá! Como posso ajudar?</Box>
+        <Box
+          alignSelf={"center"}
+          my={"auto"}
+          fontSize={"1.5rem"}
+          fontWeight={"bold"}
+        >
+          Olá, como posso ajudar?
+        </Box>
       )}
+      {newMessageIsLoading && (
+        <Box my={1} p={2}>
+          <Spinner />
+        </Box>
+      )}
+
       <div ref={messagesEndRef} />
     </Flex>
   );
