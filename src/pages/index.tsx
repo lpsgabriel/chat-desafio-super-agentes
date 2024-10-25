@@ -60,6 +60,7 @@ export default function Home() {
       </Flex>
       <Flex flexDirection={"row"} overflow={"hidden"} flexGrow={1} w={"100%"}>
         <Conversations
+          selectedConversationId={selectedConversationId}
           onSelectConversation={handleSelectConversation}
           conversations={conversations}
           loadConversations={loadConversations}

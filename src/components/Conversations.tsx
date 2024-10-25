@@ -6,6 +6,7 @@ import { IMessageDb } from "@/@types/IMessage";
 
 interface ConversationsProps {
   conversations: IConversation[];
+  selectedConversationId: string | null;
   onSelectConversation: (
     conversationId: string,
     messages: IMessageDb[]
@@ -16,6 +17,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   conversations,
   onSelectConversation,
   loadConversations,
+  selectedConversationId,
 }) => {
   const [conversationList, setConversationList] = useState<IConversation[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -74,7 +76,9 @@ const Conversations: React.FC<ConversationsProps> = ({
             my={2}
             p={3}
             borderRadius="md"
-            bg="#1a1a1a"
+            bg={
+              conversation.id === selectedConversationId ? "#2a2a2a" : "#1a1a1a"
+            }
             _hover={{ bg: "#2a2a2a", cursor: "pointer" }}
             onClick={() => handleConversationClick(conversation.id)}
           >
