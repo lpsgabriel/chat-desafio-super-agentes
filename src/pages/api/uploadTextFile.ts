@@ -1,3 +1,4 @@
+import os from "os";
 import { NextApiRequest, NextApiResponse } from "next";
 import { IncomingForm, Files, Fields } from "formidable";
 import { fileQueue } from "@/lib/fileQueue/fileQueue";
@@ -16,7 +17,10 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      const form = new IncomingForm();
+      const form = new IncomingForm({
+        uploadDir: os.tmpdir(),
+        keepExtensions: true,
+      });
       const parseForm = (): Promise<{ fields: Fields; files: Files }> => {
         return new Promise((resolve, reject) => {
           form.parse(req, (err, fields, files) => {
