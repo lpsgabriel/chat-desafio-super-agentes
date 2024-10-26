@@ -75,16 +75,16 @@ export default async function handler(
         },
       });
       const gptResponse = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
             content:
-              "Você é um assistente que processa textos extraídos de imagens.",
+              "Você é um assistente que processa descrições de objetos, elementos, pessoas, entre outros que foram extraídos da análise de imagens.",
           },
           {
             role: "user",
-            content: `Aqui está o texto extraído de uma imagem: ${descriptions}, processe o texto, interprete-o e gere uma resposta baseada no conteúdo visual descrito pelo texto, sem citar que voce processou o texto, apenas descrevendo a imagem.`,
+            content: `Aqui está descrições extraídas de uma imagem: ${descriptions}, processe essas descrições, interprete-as e gere uma resposta baseada no conteúdo visual descrito, sem citar que voce processou essas descrições, apenas descrevendo a imagem.`,
           },
         ],
       });

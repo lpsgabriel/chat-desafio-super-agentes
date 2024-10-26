@@ -4,6 +4,7 @@ import { IncomingForm, Files, Fields } from "formidable";
 import { fileQueue } from "@/lib/fileQueue/fileQueue";
 import { PrismaClient } from "@prisma/client";
 import { createNewConversation } from "@/utils";
+import fs from "fs";
 
 const prisma = new PrismaClient();
 
@@ -17,10 +18,12 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      const form = new IncomingForm({
-        uploadDir: os.tmpdir(),
-        keepExtensions: true,
-      });
+      const uploadDir = process.env.UPLOAD_DIR || os.tmpdir();
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const form = new IncomingForm({ uploadDir, keepExtensions: true });
       const parseForm = (): Promise<{ fields: Fields; files: Files }> => {
         return new Promise((resolve, reject) => {
           form.parse(req, (err, fields, files) => {

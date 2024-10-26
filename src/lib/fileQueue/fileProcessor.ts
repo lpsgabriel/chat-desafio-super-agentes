@@ -13,7 +13,7 @@ export async function processTextFile(
     const text = fs.readFileSync(filePath, "utf8");
 
     const gptResponse = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -22,7 +22,7 @@ export async function processTextFile(
         },
         {
           role: "user",
-          content: `Aqui está o conteúdo do arquivo: ${text} processe-o, interprete-o afim de enriquecer as próximas respostas e contextos passados na conversa.`,
+          content: `Aqui está o conteúdo de um arquivo .txt: ${text} processe-o e interprete-o afim de enriquecer as próximas respostas e contextos passados na conversa.`,
         },
       ],
     });
@@ -54,7 +54,7 @@ export async function processTextFile(
         data: {
           conversationId,
           type: "text",
-          origin: "assistant",
+          origin: "system",
           content: "Arquivo anexado ao contexto da conversa!",
           createdAt: new Date(now.getTime() + 20),
         },

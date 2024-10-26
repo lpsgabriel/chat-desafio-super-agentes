@@ -7,8 +7,15 @@ export async function getAIResponse(messages: IMessageGpt[]) {
   });
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: messages,
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Você é um assistente de conversa modelo gpt-4o-mini, utilizado para conversas com usuários finais, gerando respostas inteligentes, personalizadas e com profundidade.",
+        },
+        ...messages,
+      ],
     });
     return completion.choices[0].message.content;
   } catch (error) {
